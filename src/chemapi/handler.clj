@@ -1,18 +1,22 @@
 (ns chemapi.handler
   (:require [compojure.api.sweet :refer :all]
+            [compojure.handler :as handler]
             [ring.util.http-response :refer :all]
-            [schema.core :as s]))
+            [schema.core :as s]
+            [chemapi.mol :as mol]))
 
-(s/defschema Message {:message String})
-
-(defapi app
+(defapi api
   (swagger-ui)
   (swagger-docs
-    :title "Chemapi")
-  (swaggered "api"
-    :description "hello world"
-    (GET* "/hello" []
-      :return Message
-      :query-params [name :- String]
-      :summary "say hello"
-      (ok {:message (str "Hello, " name)}))))
+    :title "Chemistry API")
+  (swaggered "molfile"
+    :description "MOL/MDL endpoints"
+    (POST* "/api/molfile" []
+           :summary "parses a molfile"
+           (fn [request]
+             (let [molfile (get-in request [:params :file :tempfile])]
+               (when molfile
+                 (ok (mol/parse-mol molfile))))))))
+
+(def app
+  (handler/site api))
