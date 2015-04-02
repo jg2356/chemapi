@@ -7,31 +7,32 @@
     [k (fmod (subs line si sj))]))
 
 (defn- parse-segments [line scoll & fcoll]
-  (let [fmod (apply comp fcoll)]
-    (for [s scoll]
-      (parse-segment line (concat s fcoll)))))
+  (let [fmod (apply comp fcoll)
+        data (for [s scoll]
+               (parse-segment line (concat s fcoll)))]
+    (into {} data)))
 
 (defn- parse-table [line]
-  (let [m (parse-segments line [[:atom-count 0 3]
-                                [:bond-count 3 6]]
-                          #(Long/parseLong %)
-                          s/trim)]
-    (into {} m)))
+  (parse-segments line
+                  [[:atom-count 0 3]
+                   [:bond-count 3 6]]
+                  #(Long/parseLong %)
+                  s/trim))
 
 (defn- parse-atom [line]
-  (let [m (parse-segments line [[:x 0 10]
-                                [:y 10 20]
-                                [:z 20 30]
-                                [:atom 30 34]]
-                          s/trim)]
-    (into {} m)))
+  (parse-segments line
+                  [[:x 0 10]
+                   [:y 10 20]
+                   [:z 20 30]
+                   [:atom 30 34]]
+                  s/trim))
 
 (defn- parse-bond [line]
-  (let [m (parse-segments line [[:a 0 3]
-                                [:b 3 6]
-                                [:bond 6 9]]
-                          s/trim)]
-    (into {} m)))
+  (parse-segments line
+                  [[:a 0 3]
+                   [:b 3 6]
+                   [:bond 6 9]]
+                  s/trim))
 
 (defn parse-mol [f]
   (with-open [fr (io/reader
