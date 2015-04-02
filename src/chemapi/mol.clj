@@ -34,22 +34,26 @@
     (into {} m)))
 
 (defn parse-mol [f]
-  (with-open [fr (io/reader (io/as-file f))]
-    (let [lines (->> (line-seq fr)
-                     (vec))
-          moltitle (-> (nth lines 0))
-          software (-> (nth lines 1))
-          table (-> (nth lines 3)
-                    (parse-table))
-          {:keys [atom-count bond-count]} table
+  (with-open [fr (io/reader
+                  (io/as-file f))]
+    (let [lines (vec
+                 (line-seq fr))
+          moltitle (nth lines 0)
+          software (nth lines 1)
+          table (parse-table
+                 (nth lines 3))
+          {:keys [atom-count
+                  bond-count]} table
           atom-min 4
-          atom-max (+ atom-min atom-count)
+          atom-max (+ atom-min
+                      atom-count)
           bond-min atom-max
-          bond-max (+ bond-min bond-count)
-          atoms (->> (subvec lines atom-min atom-max)
-                     (map parse-atom))
-          bonds (->> (subvec lines bond-min bond-max)
-                     (map parse-bond))]
+          bond-max (+ bond-min
+                      bond-count)
+          atoms (map parse-atom
+                     (subvec lines atom-min atom-max))
+          bonds (map parse-bond
+                     (subvec lines bond-min bond-max))]
       {:title moltitle
        :software software
        :table table
