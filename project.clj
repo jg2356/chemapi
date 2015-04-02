@@ -5,6 +5,6 @@
                  [metosin/ring-http-response "0.6.1"]
                  [metosin/ring-swagger-ui "2.1.8-M1"]]
   :ring {:handler chemapi.handler/app}
-  :uberjar-name "server.jar"
+  :uberjar-name "molapi.war"
   :profiles {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]]
                    :plugins [[lein-ring "0.9.2"]]}})
