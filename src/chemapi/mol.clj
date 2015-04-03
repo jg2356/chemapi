@@ -75,6 +75,3 @@
        :table table
        :atoms atoms
        :bonds bonds})))
-
-(let [mol (parse-mol "Amfetamine.mol")]
-  mol)
