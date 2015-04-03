@@ -2,33 +2,33 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as s]))
 
-(defn- parse-segment [line [k si sj & fcoll]]
+(defn- map-segment [line [k si sj & fcoll]]
   (let [fmod (apply comp fcoll)]
     [k (fmod (subs line si sj))]))
 
-(defn- parse-segments [line scoll & fcoll]
+(defn- map-segments [line scoll & fcoll]
   (let [fmod (apply comp fcoll)
         data (for [s scoll]
-               (parse-segment line (concat s fcoll)))]
+               (map-segment line (concat s fcoll)))]
     (into {} data)))
 
-(defn- parse-table [line]
-  (parse-segments line
+(defn- map-table [line]
+  (map-segments line
                   [[:atom-count 0 3]
                    [:bond-count 3 6]]
                   #(Long/parseLong %)
                   s/trim))
 
-(defn- parse-atom [line]
-  (parse-segments line
+(defn- map-atom [line]
+  (map-segments line
                   [[:x 0 10]
                    [:y 10 20]
                    [:z 20 30]
                    [:atom 30 34]]
                   s/trim))
 
-(defn- parse-bond [line]
-  (parse-segments line
+(defn- map-bond [line]
+  (map-segments line
                   [[:a 0 3]
                    [:b 3 6]
                    [:bond 6 9]]
@@ -41,7 +41,7 @@
                  (line-seq fr))
           moltitle (nth lines 0)
           software (nth lines 1)
-          table (parse-table
+          table (map-table
                  (nth lines 3))
           {:keys [atom-count
                   bond-count]} table
@@ -51,9 +51,9 @@
           bond-min atom-max
           bond-max (+ bond-min
                       bond-count)
-          atoms (map parse-atom
+          atoms (map map-atom
                      (subvec lines atom-min atom-max))
-          bonds (map parse-bond
+          bonds (map map-bond
                      (subvec lines bond-min bond-max))]
       {:title moltitle
        :software software
