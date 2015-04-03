@@ -1,6 +1,18 @@
 (ns chemapi.mol
   (:require [clojure.java.io :as io]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [chemapi.tables :as t]))
+
+
+(defn- find-atom [value]
+  (filter (fn [{:keys [symbol number]}]
+            (or (= value symbol)
+                (= value number))) t/periodic-table))
+
+(defn- find-bond [value]
+  (filter (fn [{:keys [type label]}]
+            (or (= value type)
+                (= value label))) t/bond-table))
 
 (defn- map-segment [line [k si sj & fcoll]]
   (let [fmod (apply comp fcoll)]
@@ -14,25 +26,25 @@
 
 (defn- map-table [line]
   (map-segments line
-                  [[:atom-count 0 3]
-                   [:bond-count 3 6]]
-                  #(Long/parseLong %)
-                  s/trim))
+                [[:atom-count 0 3]
+                 [:bond-count 3 6]]
+                #(Long/parseLong %)
+                s/trim))
 
 (defn- map-atom [line]
   (map-segments line
-                  [[:x 0 10]
-                   [:y 10 20]
-                   [:z 20 30]
-                   [:atom 30 34]]
-                  s/trim))
+                [[:x 0 10]
+                 [:y 10 20]
+                 [:z 20 30]
+                 [:atom 30 34 first find-atom]]
+                s/trim))
 
 (defn- map-bond [line]
   (map-segments line
-                  [[:a 0 3]
-                   [:b 3 6]
-                   [:bond 6 9]]
-                  s/trim))
+                [[:a 0 3]
+                 [:b 3 6]
+                 [:bond 6 9 first find-bond]]
+                s/trim))
 
 (defn parse-mol [f]
   (with-open [fr (io/reader
