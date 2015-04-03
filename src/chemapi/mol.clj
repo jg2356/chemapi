@@ -3,16 +3,20 @@
             [clojure.string :as s]
             [chemapi.tables :as t]))
 
+(defn- parse-decimal [v]
+  (BigDecimal. v))
+
+(defn- parse-integer [v]
+  (Integer. v))
 
 (defn- find-atom [value]
   (filter (fn [{:keys [symbol number]}]
             (or (= value symbol)
-                (= value number))) t/periodic-table))
+                (= value (str number)))) t/periodic-table))
 
 (defn- find-bond [value]
-  (filter (fn [{:keys [type label]}]
-            (or (= value type)
-                (= value label))) t/bond-table))
+  (filter (fn [{:keys [type]}]
+            (= value type)) t/bond-table))
 
 (defn- map-segment [line [k si sj & fcoll]]
   (let [fmod (apply comp fcoll)]
@@ -28,14 +32,13 @@
   (map-segments line
                 [[:atom-count 0 3]
                  [:bond-count 3 6]]
-                #(Long/parseLong %)
-                s/trim))
+                parse-integer s/trim))
 
 (defn- map-atom [line]
   (map-segments line
-                [[:x 0 10]
-                 [:y 10 20]
-                 [:z 20 30]
+                [[:x 0 10 parse-decimal]
+                 [:y 10 20 parse-decimal]
+                 [:z 20 30 parse-decimal]
                  [:atom 30 34 first find-atom]]
                 s/trim))
 
@@ -44,7 +47,7 @@
                 [[:a 0 3]
                  [:b 3 6]
                  [:bond 6 9 first find-bond]]
-                s/trim))
+                parse-integer s/trim))
 
 (defn parse-mol [f]
   (with-open [fr (io/reader
