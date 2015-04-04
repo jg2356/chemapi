@@ -2,6 +2,7 @@
   (:require [compojure.api.sweet :refer :all]
             [compojure.handler :as handler]
             [ring.util.http-response :refer :all]
+            [ring.middleware.cors :refer [wrap-cors]]
             [schema.core :as s]
             [chemapi.mol :as mol]))
 
@@ -31,4 +32,6 @@
                  (ok (mol/parse-mol molfile))))))))
 
 (def app
-  (handler/site api))
+  (-> (routes api)
+      (handler/site)
+      (wrap-cors #".*")))
