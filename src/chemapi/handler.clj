@@ -14,7 +14,7 @@
   (swagger-docs
     :title "Chemistry API")
   (swaggered "molfile"
-    :description "MOL/MDL endpoints"
+    :description "molecular structure file endpoint"
     (POST* "/api/molfile" []
            :summary
            "<form class=\"sandbox\" method=\"POST\" action=\"api/molfile\" enctype=\"multipart/form-data\">
