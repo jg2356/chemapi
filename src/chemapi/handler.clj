@@ -16,17 +16,15 @@
     :description "MOL/MDL endpoints"
     (POST* "/api/molfile" []
            :summary
-           "
-           <form class=\"sandbox\" method=\"POST\" action=\"/api/molfile\" enctype=\"multipart/form-data\">
-             <label for=\"molfile_file\">file: <label><input id=\"molfile_file\" name=\"file\" type=\"file\" />
-             <input class=\"submit\" name=\"commit\" type=\"button\" value=\"Try it out!\" onclick=\"$('#molfile_postApiMolfile_content').slideDown();\">
-           </form>
-           <style>
-             #molfile_postApiMolfile_content form {
-               display: none!important;
-             }
-           </style>
-           "
+           "<form class=\"sandbox\" method=\"POST\" action=\"api/molfile\" enctype=\"multipart/form-data\">
+              <label>file: <label><input name=\"file\" type=\"file\" />
+              <input class=\"submit\" name=\"commit\" type=\"button\" value=\"Try it out!\" onclick=\"$('#molfile_postApiMolfile_content').slideDown();\">
+            </form>
+            <style>
+              #molfile_postApiMolfile_content form {
+                display: none!important;
+              }
+            </style>"
            (fn [request]
              (let [molfile (get-in request [:params :file :tempfile])]
                (when molfile
